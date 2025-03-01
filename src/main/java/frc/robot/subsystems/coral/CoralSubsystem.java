@@ -40,6 +40,7 @@ public class CoralSubsystem extends SubsystemBase {
         kLevel3,
         kLevel4;
     }
+    //My name is greg, i look like an egg, lookin' hard boiled, my pants are soiled//
 
     // Initialize arm SPARK. We will use MAXMotion position control for the arm, so
     // we also need to
@@ -178,6 +179,13 @@ public class CoralSubsystem extends SubsystemBase {
     /** Set the intake motor power in the range of [-1, 1]. */
     private void setIntakePower(double power) {
         intakeMotor.set(power);
+    }
+
+    public Command setArmPositionCommand(double position) {
+        return this.runOnce(() -> {
+            armCurrentTarget = position;
+            moveToSetpoint();
+        });
     }
 
     /**
