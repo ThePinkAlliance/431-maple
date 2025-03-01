@@ -16,6 +16,22 @@
     },
     {
       "anchor": {
+        "x": 6.4004476242863255,
+        "y": 5.133833027210326
+      },
+      "prevControl": {
+        "x": 6.635667120871094,
+        "y": 5.218519439499476
+      },
+      "nextControl": {
+        "x": 6.165228127701557,
+        "y": 5.049146614921176
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
         "x": 5.1919753615920605,
         "y": 5.263732250316723
       },
@@ -34,7 +50,7 @@
   "eventMarkers": [
     {
       "name": "lift_elevator",
-      "waypointRelativePos": 0.38679661544850485,
+      "waypointRelativePos": 0.6,
       "endWaypointRelativePos": null,
       "command": null
     }
