@@ -83,7 +83,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                     TunerConstants.FrontLeft.WheelRadius,
                     TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
                     WHEEL_COF,
-                    DCMotor.getKrakenX60Foc(1).withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
+                    DCMotor.getKrakenX60(1).withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
                     TunerConstants.FrontLeft.SlipCurrent,
                     1),
             getModuleTranslations());
@@ -94,7 +94,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
             .withGyro(COTS.ofPigeon2())
             .withSwerveModule(new SwerveModuleSimulationConfig(
                     DCMotor.getKrakenX60(1),
-                    DCMotor.getFalcon500(1),
+                    DCMotor.getKrakenX60(1),
                     TunerConstants.FrontLeft.DriveMotorGearRatio,
                     TunerConstants.FrontLeft.SteerMotorGearRatio,
                     Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
@@ -151,7 +151,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 this::setPose,
                 this::getChassisSpeeds,
                 this::runVelocity,
-                new PPHolonomicDriveController(new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+                new PPHolonomicDriveController(new PIDConstants(7.0, 0.0, 0.0), new PIDConstants(7.0, 0.0, 0.0)),
                 PP_CONFIG,
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 this);

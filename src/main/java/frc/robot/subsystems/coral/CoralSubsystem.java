@@ -11,6 +11,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
@@ -28,6 +31,7 @@ import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.ElevatorSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.IntakeSetpoints;
 import frc.robot.Constants.SimulationRobotConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class CoralSubsystem extends SubsystemBase {
     /** Subsystem-wide setpoints */
@@ -335,6 +339,10 @@ public class CoralSubsystem extends SubsystemBase {
                         m_armSim.getVelocityRadPerSec() * SimulationRobotConstants.kArmReduction),
                 RobotController.getBatteryVoltage(),
                 0.02);
+
+        Pose2d pose = new Pose2d(new Translation2d(0, this.m_elevatorSim.getPositionMeters()), new Rotation2d());
+
+        Logger.recordOutput("Coral/ZeroedCompoenentPoses", new Pose2d[] {pose});
 
         // SimBattery is updated in Robot.java
     }
