@@ -74,6 +74,7 @@ public final class Configs {
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                     // Set PID values for position control
                     .p(0.1)
+                    .i(0)
                     .outputRange(-1, 1)
                     .maxMotion
                     // Set MAXMotion parameters for position control
@@ -134,8 +135,7 @@ public final class Configs {
                     .p(0.1)
                     .outputRange(-0.5, 0.5);
 
-            // Configure basic settings of the intake motor
-            intakeConfig.inverted(true).idleMode(IdleMode.kBrake).smartCurrentLimit(40);
+            // Confignfig.inverted(true).idleMode(IdleMode.kBrake).smartCurrentLimit(40);
         }
     }
 }

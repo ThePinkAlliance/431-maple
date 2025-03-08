@@ -17,7 +17,8 @@ public class TestGroup extends SequentialCommandGroup {
     public TestGroup(CoralSubsystem coralSubsystem) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
-        addCommands(coralSubsystem.setSetpointCommand(Setpoint.kLevel1),
+        addCommands(
+                coralSubsystem.setSetpointCommand(Setpoint.kLevel1),
                 new WaitCommand(1),
                 coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
     }
