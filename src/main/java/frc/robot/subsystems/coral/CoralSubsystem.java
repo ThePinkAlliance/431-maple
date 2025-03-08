@@ -231,7 +231,7 @@ public class CoralSubsystem extends SubsystemBase {
         return this.runOnce(() -> {
             armCurrentTarget = target;
             moveToSetpoint();
-            new WaitUntilCommand(()->armEncoder.getPosition() == target);
+            new WaitUntilCommand(()->(Math.abs(armEncoder.getPosition() - target) <= 1));
         });
     }
 
