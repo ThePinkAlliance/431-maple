@@ -226,6 +226,13 @@ public class CoralSubsystem extends SubsystemBase {
         });
     }
 
+    public Command setArmRotationCommand(double target) {
+        return this.runOnce(() -> {
+            armCurrentTarget = target;
+            moveToSetpoint();
+        });
+    }
+
     public Command movePointUpCommand() {
         return this.runOnce(() -> {
             switch (level) {
