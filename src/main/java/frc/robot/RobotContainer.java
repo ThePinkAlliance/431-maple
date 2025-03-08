@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.removeAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem.Setpoint;
@@ -156,6 +157,7 @@ public class RobotContainer {
     public void registerNamedCommands() {
         NamedCommands.registerCommand("deposit", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
         NamedCommands.registerCommand("stow", coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
+        NamedCommands.registerCommand("free_algae", new removeAlgae(coralSubsystem));
     }
 
     /**
