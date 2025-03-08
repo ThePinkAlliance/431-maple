@@ -18,11 +18,11 @@ public class removeAlgae extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       coralSubsystem.setArmRotationCommand(32),
-      new WaitCommand(5),
+      //new WaitCommand(5),
       coralSubsystem.setArmRotationCommand(20),
-      new WaitCommand(5),
+      //new WaitCommand(5),
       coralSubsystem.setArmRotationCommand(40),
-      new WaitCommand(5)
+      //new WaitCommand(5)
     );
   }
 }
