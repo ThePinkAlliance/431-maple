@@ -31,6 +31,7 @@ import frc.robot.Constants.CoralSubsystemConstants;
 import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.ElevatorSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.IntakeSetpoints;
+import frc.robot.commands.moveArm;
 import frc.robot.Constants.SimulationRobotConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -50,8 +51,8 @@ public class CoralSubsystem extends SubsystemBase {
     // we also need to
     // initialize the closed loop controller and encoder.
     private SparkMax armMotor = new SparkMax(CoralSubsystemConstants.kArmMotorCanId, MotorType.kBrushless);
-    private SparkClosedLoopController armController = armMotor.getClosedLoopController();
-    private RelativeEncoder armEncoder = armMotor.getEncoder();
+    public SparkClosedLoopController armController = armMotor.getClosedLoopController();
+    public RelativeEncoder armEncoder = armMotor.getEncoder();
 
     // Initialize elevator SPARK. We will use MAXMotion position control for the
     // elevator, so we also
@@ -68,7 +69,7 @@ public class CoralSubsystem extends SubsystemBase {
     // Member variables for subsystem state management
     private boolean wasResetByButton = false;
     private boolean wasResetByLimit = false;
-    private double armCurrentTarget = ArmSetpoints.kFeederStation;
+    public double armCurrentTarget = ArmSetpoints.kFeederStation;
     private double elevatorCurrentTarget = ElevatorSetpoints.kFeederStation;
 
     // Simulation setup and variables
@@ -150,7 +151,7 @@ public class CoralSubsystem extends SubsystemBase {
      * will allow for a smooth acceleration and deceleration to the mechanisms'
      * setpoints.
      */
-    private void moveToSetpoint() {
+    public void moveToSetpoint() {
         armController.setReference(armCurrentTarget, ControlType.kMAXMotionPositionControl);
         elevatorClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
     }
@@ -228,11 +229,7 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     public Command setArmRotationCommand(double target) {
-        return this.runOnce(() -> {
-            armCurrentTarget = target;
-            moveToSetpoint();
-            new WaitUntilCommand(()->(Math.abs(armEncoder.getPosition() - target) <= 2));
-        });
+        return new moveArm(this, target);
     }
 
     public Command movePointUpCommand() {
