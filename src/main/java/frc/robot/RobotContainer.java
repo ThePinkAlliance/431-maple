@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.commands.DriveCommands;
@@ -47,9 +49,12 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
- * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a "declarative" paradigm, very
+ * little robot logic should actually be handled in the {@link Robot} periodic
+ * methods (other than the scheduler calls).
+ * Instead, the structure of the robot (including subsystems, commands, and
+ * button mappings) should be declared here.
  */
 public class RobotContainer {
     // Subsystems
@@ -65,7 +70,9 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
     public RobotContainer() {
         coralSubsystem = new CoralSubsystem();
 
@@ -81,7 +88,8 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                         new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                         new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                        (pose) -> {});
+                        (pose) -> {
+                        });
                 this.vision = new Vision(
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
@@ -116,13 +124,21 @@ public class RobotContainer {
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        (pose) -> {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        (pose) -> {
+                        });
+                vision = new Vision(drive, new VisionIO() {
+                }, new VisionIO() {
+                });
 
                 break;
         }
@@ -144,15 +160,20 @@ public class RobotContainer {
     }
 
     public void registerNamedCommands() {
-        NamedCommands.registerCommand("deposit", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        NamedCommands.registerCommand("level_3", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        NamedCommands.registerCommand("level_2", coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        NamedCommands.registerCommand("level_1", coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
         NamedCommands.registerCommand("stow", coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
         NamedCommands.registerCommand("free_algae", new removeAlgae(coralSubsystem));
     }
 
     /**
-     * Use this method to define your button->command mappings. Buttons can be created by instantiating a
-     * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
-     * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * Use this method to define your button->command mappings. Buttons can be
+     * created by instantiating a
+     * {@link GenericHID} or one of its subclasses
+     * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
+     * and then passing it to a
+     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
@@ -161,6 +182,11 @@ public class RobotContainer {
                 () -> -controller.getRawAxis(1),
                 () -> -controller.getRawAxis(0),
                 () -> -controller.getRawAxis(3)));
+
+        new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        new POVButton(controller, 90).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
 
         new JoystickButton(controller, ButtonID.A).onTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).onTrue(coralSubsystem.reverseIntakeCommand());
@@ -177,14 +203,16 @@ public class RobotContainer {
     }
 
     public void resetSimulationField() {
-        if (Constants.currentMode != Constants.Mode.SIM) return;
+        if (Constants.currentMode != Constants.Mode.SIM)
+            return;
 
         driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 
     public void updateSimulation() {
-        if (Constants.currentMode != Constants.Mode.SIM) return;
+        if (Constants.currentMode != Constants.Mode.SIM)
+            return;
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
