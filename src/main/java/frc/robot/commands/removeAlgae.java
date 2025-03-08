@@ -15,8 +15,6 @@ public class removeAlgae extends SequentialCommandGroup {
     public removeAlgae(CoralSubsystem coralSubsystem) {
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
-        addCommands(
-                coralSubsystem.setArmRotationCommand(6),
-                coralSubsystem.setArmRotationCommand(13));
+        addCommands(coralSubsystem.setArmRotationCommand(6), coralSubsystem.setArmRotationCommand(13));
     }
 }
