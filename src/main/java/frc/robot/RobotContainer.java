@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.removeAlgae;
@@ -179,6 +181,11 @@ public class RobotContainer {
                 () -> -controller.getRawAxis(1),
                 () -> -controller.getRawAxis(0),
                 () -> -controller.getRawAxis(3)));
+
+        new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        new POVButton(controller, 90).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
 
         new JoystickButton(controller, ButtonID.A).onTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).onTrue(coralSubsystem.reverseIntakeCommand());
