@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "start 3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "seg 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "seg 3"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "score 2 coral",
+  "choreoAuto": false
+}
