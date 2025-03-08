@@ -21,7 +21,7 @@ public class removeAlgae extends SequentialCommandGroup {
       new WaitCommand(5),
       coralSubsystem.setArmRotationCommand(20),
       new WaitCommand(5),
-      coralSubsystem.setArmRotationCommand(54),
+      coralSubsystem.setArmRotationCommand(40),
       new WaitCommand(5)
     );
   }
