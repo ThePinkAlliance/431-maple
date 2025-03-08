@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.removeAlgae;
 import frc.robot.generated.TunerConstants;
@@ -163,6 +164,7 @@ public class RobotContainer {
 
         new JoystickButton(controller, ButtonID.A).onTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).onTrue(coralSubsystem.reverseIntakeCommand());
+        new JoystickButton(controller, ButtonID.X).onTrue(coralSubsystem.setArmRotationCommand(ArmSetpoints.kFeederStation));
    }
 
     /**
