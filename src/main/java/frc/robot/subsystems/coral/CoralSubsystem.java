@@ -144,8 +144,10 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     /**
-     * Drive the arm and elevator motors to their respective setpoints. This will use MAXMotion position control which
-     * will allow for a smooth acceleration and deceleration to the mechanisms' setpoints.
+     * Drive the arm and elevator motors to their respective setpoints. This will
+     * use MAXMotion position control which
+     * will allow for a smooth acceleration and deceleration to the mechanisms'
+     * setpoints.
      */
     private void moveToSetpoint() {
         armController.setReference(armCurrentTarget, ControlType.kMAXMotionPositionControl);
@@ -165,7 +167,10 @@ public class CoralSubsystem extends SubsystemBase {
         }
     }
 
-    /** Zero the arm and elevator encoders when the user button is pressed on the roboRIO. */
+    /**
+     * Zero the arm and elevator encoders when the user button is pressed on the
+     * roboRIO.
+     */
     private void zeroOnUserButton() {
         if (!wasResetByButton && RobotController.getUserButton()) {
             // Zero the encoders only when button switches from "unpressed" to "pressed" to
@@ -185,7 +190,8 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command to set the subsystem setpoint. This will set the arm and elevator to their predefined positions for the
+     * Command to set the subsystem setpoint. This will set the arm and elevator to
+     * their predefined positions for the
      * given setpoint.
      */
     public Command setSetpointCommand(Setpoint setpoint) {
@@ -263,7 +269,8 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command to run the intake motor. When the command is interrupted, e.g. the button is released, the motor will
+     * Command to run the intake motor. When the command is interrupted, e.g. the
+     * button is released, the motor will
      * stop.
      */
     public Command runIntakeCommand() {
@@ -271,7 +278,8 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command to reverses the intake motor. When the command is interrupted, e.g. the button is released, the motor
+     * Command to reverses the intake motor. When the command is interrupted, e.g.
+     * the button is released, the motor
      * will stop.
      */
     public Command reverseIntakeCommand() {
@@ -304,7 +312,7 @@ public class CoralSubsystem extends SubsystemBase {
                                 + Units.rotationsToDegrees(
                                         armEncoder.getPosition() / SimulationRobotConstants.kArmReduction))
                         - 90 // subtract 90 degrees to account for the elevator
-                );
+        );
     }
 
     /** Get the current drawn by each simulation physics model */
@@ -329,8 +337,8 @@ public class CoralSubsystem extends SubsystemBase {
         // Iterate the elevator and arm SPARK simulations
         elevatorMotorSim.iterate(
                 ((m_elevatorSim.getVelocityMetersPerSecond()
-                                        / (SimulationRobotConstants.kElevatorDrumRadius * 2.0 * Math.PI))
-                                * SimulationRobotConstants.kElevatorGearing)
+                        / (SimulationRobotConstants.kElevatorDrumRadius * 2.0 * Math.PI))
+                        * SimulationRobotConstants.kElevatorGearing)
                         * 60.0,
                 RobotController.getBatteryVoltage(),
                 0.02);
@@ -342,7 +350,7 @@ public class CoralSubsystem extends SubsystemBase {
 
         Pose2d pose = new Pose2d(new Translation2d(0, this.m_elevatorSim.getPositionMeters()), new Rotation2d());
 
-        Logger.recordOutput("Coral/ZeroedCompoenentPoses", new Pose2d[] {pose});
+        Logger.recordOutput("Coral/ZeroedCompoenentPoses", new Pose2d[] { pose });
 
         // SimBattery is updated in Robot.java
     }

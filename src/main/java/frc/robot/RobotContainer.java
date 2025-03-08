@@ -69,6 +69,10 @@ public class RobotContainer {
      */
     public RobotContainer() {
         coralSubsystem = new CoralSubsystem();
+
+        // Registers all the commands that pathplanner will use before autos.
+        registerNamedCommands();
+
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
@@ -135,10 +139,6 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-        NamedCommands.registerCommand("deposit", Commands.none());
-        NamedCommands.registerCommand("stow", Commands.none());
-
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
         autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
@@ -151,6 +151,11 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+    }
+
+    public void registerNamedCommands() {
+        NamedCommands.registerCommand("deposit", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        NamedCommands.registerCommand("stow", coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
     }
 
     /**
@@ -166,15 +171,8 @@ public class RobotContainer {
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRawAxis(2)));
 
-        // Lock to 0° when A button is held
-        // controller
-        // .a()
-        // .whileTrue(DriveCommands.joystickDriveAtAngle(
-        // drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new
-        // Rotation2d()));
-
-        new JoystickButton(controller.getHID(), 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
-        new JoystickButton(controller.getHID(), 1).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
+        new JoystickButton(controller.getHID(), 1).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        new JoystickButton(controller.getHID(), 2).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM

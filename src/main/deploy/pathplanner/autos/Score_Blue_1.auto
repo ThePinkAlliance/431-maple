@@ -9,6 +9,30 @@
           "data": {
             "pathName": "Curve"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "free_algae"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deposit"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stow"
+          }
         }
       ]
     }
