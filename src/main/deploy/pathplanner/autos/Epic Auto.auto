@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "test"
+            "pathName": "center_seg_1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "free_algae"
           }
         }
       ]
