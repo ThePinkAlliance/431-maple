@@ -151,9 +151,8 @@ public class CoralSubsystem extends SubsystemBase {
      * will allow for a smooth acceleration and deceleration to the mechanisms' setpoints.
      */
     public void moveToSetpoint() {
-        armController.setReference(armCurrentTarget, ControlType.kMAXMotionPositionControl);
-        elevatorClosedLoopController.setReference(
-                elevatorCurrentTarget, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
+        armController.setReference(armCurrentTarget, ControlType.kPosition);
+        elevatorClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     /** Zero the elevator encoder when the limit switch is pressed. */

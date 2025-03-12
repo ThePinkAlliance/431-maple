@@ -11,7 +11,7 @@
 *.o
 *.obj
 
-.vscode/
+.vscode/settings.json
 
 # Precompiled Headers
 *.gch
