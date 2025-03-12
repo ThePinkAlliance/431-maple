@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
@@ -43,10 +45,18 @@ public class AlgaeSubsystem extends SubsystemBase {
         intakeMotor.set(power);
     }
 
+    public Command setPowerCommand(double power) {
+        return this.run(() -> setPower(power));
+    }
+
     public void setRotation(double target) {
         this.rotationClosedLoopController.setReference(target, ControlType.kPosition);
 
         Logger.recordOutput("Algae/Pivot Target", target);
+    }
+    public Command setRotationCommand(double rotations) {
+            return this.run(() -> setRotation(rotations));
+        
     }
 
     @Override
