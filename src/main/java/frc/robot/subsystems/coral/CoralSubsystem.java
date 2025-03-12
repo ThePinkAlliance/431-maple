@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.sim.SparkFlexSim;
 import com.revrobotics.sim.SparkLimitSwitchSim;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -31,7 +32,8 @@ import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.ElevatorSetpoints;
 import frc.robot.Constants.CoralSubsystemConstants.IntakeSetpoints;
 import frc.robot.Constants.SimulationRobotConstants;
-import frc.robot.commands.moveArm;
+import frc.robot.commands.arm.MoveArm;
+import frc.robot.commands.elevator.MoveElevator;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralSubsystem extends SubsystemBase {
@@ -150,7 +152,8 @@ public class CoralSubsystem extends SubsystemBase {
      */
     public void moveToSetpoint() {
         armController.setReference(armCurrentTarget, ControlType.kMAXMotionPositionControl);
-        elevatorClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
+        elevatorClosedLoopController.setReference(
+                elevatorCurrentTarget, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0);
     }
 
     /** Zero the elevator encoder when the limit switch is pressed. */
@@ -221,8 +224,20 @@ public class CoralSubsystem extends SubsystemBase {
         });
     }
 
+    public void setElevatorTarget(double target) {
+        this.elevatorCurrentTarget = target;
+    }
+
+    public double getElevatorPosition() {
+        return elevatorEncoder.getPosition();
+    }
+
+    public Command setElevatorCommand(double target) {
+        return new MoveElevator(this, target);
+    }
+
     public Command setArmRotationCommand(double target) {
-        return new moveArm(this, target);
+        return new MoveArm(this, target);
     }
 
     public Command movePointUpCommand() {
@@ -276,6 +291,14 @@ public class CoralSubsystem extends SubsystemBase {
     }
 
     /**
+     * Command to run the intake motor. When the command is interrupted, e.g. the button is released, the motor will
+     * stop.
+     */
+    public Command stopIntakeCommand() {
+        return this.startEnd(() -> this.setIntakePower(0), () -> this.setIntakePower(0.0));
+    }
+
+    /**
      * Command to reverses the intake motor. When the command is interrupted, e.g. the button is released, the motor
      * will stop.
      */
@@ -283,10 +306,18 @@ public class CoralSubsystem extends SubsystemBase {
         return this.startEnd(() -> this.setIntakePower(IntakeSetpoints.kReverse), () -> this.setIntakePower(0.0));
     }
 
+    /**
+     * Command to reverses the intake motor. When the command is interrupted, e.g. the button is released, the motor
+     * will stop.
+     */
+    public Command reverseIntakeCommand(double power) {
+        return this.startEnd(() -> this.setIntakePower(power), () -> this.setIntakePower(0.0));
+    }
+
     @Override
     public void periodic() {
         moveToSetpoint();
-        zeroElevatorOnLimitSwitch();
+        // zeroElevatorOnLimitSwitch();
         zeroOnUserButton();
 
         // Display subsystem values

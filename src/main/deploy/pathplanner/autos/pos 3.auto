@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "free_algae"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "seg 2"
@@ -20,6 +26,12 @@
           "type": "path",
           "data": {
             "pathName": "seg 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deposit"
           }
         }
       ]

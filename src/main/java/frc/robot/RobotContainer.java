@@ -14,28 +14,28 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.CoralSubsystemConstants.ArmSetpoints;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.removeAlgae;
+import frc.robot.commands.algae.RemoveAlgae;
+import frc.robot.commands.arm.MoveArm;
+import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.ButtonID;
 import frc.robot.subsystems.coral.CoralSubsystem;
@@ -44,37 +44,35 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a "declarative" paradigm, very
- * little robot logic should actually be handled in the {@link Robot} periodic
- * methods (other than the scheduler calls).
- * Instead, the structure of the robot (including subsystems, commands, and
- * button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
+ * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
+ * Instead, the structure of the robot (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
     private final CoralSubsystem coralSubsystem;
+    // private final AlgaeSubsystem algaeSubsystem;
 
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
     private final Joystick controller = new Joystick(0);
 
+    private SendableChooser<Alliance> allianceSelect = new SendableChooser<>();
+
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         coralSubsystem = new CoralSubsystem();
+        // algaeSubsystem = new AlgaeSubsystem();
 
         // Registers all the commands that pathplanner will use before autos.
         registerNamedCommands();
@@ -88,8 +86,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.FrontRight),
                         new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                         new ModuleIOTalonFXReal(TunerConstants.BackRight),
-                        (pose) -> {
-                        });
+                        (pose) -> {});
                 this.vision = new Vision(
                         drive,
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
@@ -117,28 +114,22 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(
+                                camera2Name, robotToCamera2, driveSimulation::getSimulatedDriveTrainPose));
 
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        new ModuleIO() {
-                        },
-                        (pose) -> {
-                        });
-                vision = new Vision(drive, new VisionIO() {
-                }, new VisionIO() {
-                });
+                        new GyroIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        (pose) -> {});
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
                 break;
         }
@@ -155,43 +146,59 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+        allianceSelect.addOption("Blue", Alliance.Blue);
+        allianceSelect.addOption("Red", Alliance.Red);
+
+        SmartDashboard.putData(allianceSelect);
+
         // Configure the button bindings
         configureButtonBindings();
     }
 
     public void registerNamedCommands() {
         NamedCommands.registerCommand("level_3", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        NamedCommands.registerCommand("prep_level_3", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+
         NamedCommands.registerCommand("level_2", coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        NamedCommands.registerCommand("prep_level_2", coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+
         NamedCommands.registerCommand("level_1", coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        NamedCommands.registerCommand("prep_level_1", coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+
         NamedCommands.registerCommand("stow", coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
-        NamedCommands.registerCommand("free_algae", new removeAlgae(coralSubsystem));
+        NamedCommands.registerCommand(
+                "deposit", coralSubsystem.reverseIntakeCommand().withTimeout(0.5));
+
+        NamedCommands.registerCommand("feed_coral", Commands.none());
+        NamedCommands.registerCommand("free_algae", new RemoveAlgae(coralSubsystem));
     }
 
     /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by instantiating a
-     * {@link GenericHID} or one of its subclasses
-     * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
-     * and then passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     * Use this method to define your button->command mappings. Buttons can be created by instantiating a
+     * {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}),
+     * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
-                drive,
-                () -> -controller.getRawAxis(1),
-                () -> -controller.getRawAxis(0),
-                () -> -controller.getRawAxis(3)));
+                drive, () -> controller.getRawAxis(1), () -> controller.getRawAxis(0), () -> controller.getRawAxis(4)));
 
         new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
         new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
         new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
         new POVButton(controller, 90).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
 
-        new JoystickButton(controller, ButtonID.A).onTrue(coralSubsystem.runIntakeCommand());
-        new JoystickButton(controller, ButtonID.B).onTrue(coralSubsystem.reverseIntakeCommand());
-        new JoystickButton(controller, ButtonID.X).onTrue(coralSubsystem.setArmRotationCommand(ArmSetpoints.kFeederStation));
-   }
+        new JoystickButton(controller, ButtonID.LB)
+                .onTrue(new MoveElevator(coralSubsystem, Constants.CoralSubsystemConstants.ElevatorSetpoints.kLevel4)
+                        .andThen(new MoveArm(coralSubsystem, Constants.CoralSubsystemConstants.ArmSetpoints.kLevel4))
+                        .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
+                        .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
+
+        new JoystickButton(controller, ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
+        new JoystickButton(controller, ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
+        new JoystickButton(controller, ButtonID.X)
+                .onTrue(coralSubsystem.setArmRotationCommand(ArmSetpoints.kFeederStation));
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -203,16 +210,14 @@ public class RobotContainer {
     }
 
     public void resetSimulationField() {
-        if (Constants.currentMode != Constants.Mode.SIM)
-            return;
+        if (Constants.currentMode != Constants.Mode.SIM) return;
 
         driveSimulation.setSimulationWorldPose(new Pose2d(3, 3, new Rotation2d()));
         SimulatedArena.getInstance().resetFieldForAuto();
     }
 
     public void updateSimulation() {
-        if (Constants.currentMode != Constants.Mode.SIM)
-            return;
+        if (Constants.currentMode != Constants.Mode.SIM) return;
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());

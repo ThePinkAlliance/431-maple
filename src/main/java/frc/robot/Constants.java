@@ -13,8 +13,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -61,78 +59,29 @@ public final class Constants {
 
     public static final class DriveConstants {
 
-        // Distance between right and left wheels
-        public static final double kTrackWidth = Units.inchesToMeters(23.75);
-
-        // Distance between front and back wheels
-        public static final double kWheelBase = Units.inchesToMeters(23.75);
-
-        public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-                new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
-                new Translation2d(-kWheelBase / 2, kTrackWidth / 2));
-
-        public static final int kFrontLeftDriveMotorPort = 11;
-        public static final int kBackLeftDriveMotorPort = 5;
-        public static final int kFrontRightDriveMotorPort = 8;
-        public static final int kBackRightDriveMotorPort = 2;
-
-        public static final int kFrontLeftTurningMotorPort = 10;
-        public static final int kBackLeftTurningMotorPort = 4;
-        public static final int kFrontRightTurningMotorPort = 7;
-        public static final int kBackRightTurningMotorPort = 1;
-
-        /** Port numbers for all the cancoders. */
-        public static final int kFrontLeftDriveCANCoderPort = 12;
-
-        public static final int kBackLeftDriveCANCoderPort = 6;
-        public static final int kFrontRightDriveCANCoderPort = 9;
-        public static final int kBackRightDriveCANCoderPort = 3;
-
-        public static final boolean kFrontLeftDriveEncoderReversed = true;
-        public static final boolean kBackLeftDriveEncoderReversed = true;
-        public static final boolean kFrontRightDriveEncoderReversed = false;
-        public static final boolean kBackRightDriveEncoderReversed = false;
-
-        /** These values where determined by lining up all the wheels and recording the outputed positions. */
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -0.552;
-
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -2.207;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 1.446;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -0.0184;
-
         // This is the max speed without load.
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.437;
-        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
-
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 1; // 0.96
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond =
-                kPhysicalMaxAngularSpeedRadiansPerSecond / 2.8;
-        public static double kTeleDriveSpeedReduction = 1;
-        public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 2.5;
-        public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3.5;
     }
 
     public static final class CoralSubsystemConstants {
-        public static final int kElevatorMotorCanId = 4;
-        public static final int kArmMotorCanId = 3;
-        public static final int kIntakeMotorCanId = 2;
+        public static final int kElevatorMotorCanId = 1;
+        public static final int kArmMotorCanId = 4;
+        public static final int kIntakeMotorCanId = 5;
 
         public static final class ElevatorSetpoints {
             public static final int kFeederStation = 0;
             public static final int kLevel1 = 0;
             public static final int kLevel2 = 0;
-            public static final int kLevel3 = 100;
-            public static final int kLevel4 = 150;
+            public static final int kLevel3 = 12;
+            public static final int kLevel4 = 20;
         }
 
         public static final class ArmSetpoints {
-            public static final double kFeederStation = 33;
-            public static final double kLevel1 = 0;
-            public static final double kLevel2 = 2;
-            public static final double kLevel3 = 2;
-            public static final double kLevel4 = 19;
+            public static final double kFeederStation = 12;
+            public static final double kLevel1 = 1;
+            public static final double kLevel2 = 32.25 - 2;
+            public static final double kLevel3 = 32.25;
+            public static final double kLevel4 = 25.28 - 3;
         }
 
         public static final class IntakeSetpoints {
