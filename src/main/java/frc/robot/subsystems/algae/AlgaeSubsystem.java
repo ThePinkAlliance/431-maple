@@ -39,6 +39,10 @@ public class AlgaeSubsystem extends SubsystemBase {
         return this.pivotMotor.getEncoder().getPosition();
     }
 
+    public void setPower(double power) {
+        intakeMotor.set(power);
+    }
+
     public void setRotation(double target) {
         this.rotationClosedLoopController.setReference(target, ControlType.kPosition);
 
