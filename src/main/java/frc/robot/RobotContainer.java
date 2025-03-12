@@ -32,11 +32,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.algae.MoveAlgaeWithSpeed;
 import frc.robot.commands.algae.RemoveAlgae;
 import frc.robot.commands.arm.MoveArm;
 import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.ButtonID;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem;
 import frc.robot.subsystems.coral.CoralSubsystem.Setpoint;
 import frc.robot.subsystems.drive.*;
@@ -56,7 +58,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private final CoralSubsystem coralSubsystem;
-    // private final AlgaeSubsystem algaeSubsystem;
+     private final AlgaeSubsystem algaeSubsystem;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -71,7 +73,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         coralSubsystem = new CoralSubsystem();
-        // algaeSubsystem = new AlgaeSubsystem();
+         algaeSubsystem = new AlgaeSubsystem();
 
         // Registers all the commands that pathplanner will use before autos.
         registerNamedCommands();
@@ -195,6 +197,7 @@ public class RobotContainer {
 
         new JoystickButton(controller, ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
+        new JoystickButton(controller, ButtonID.RB).whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 5,0.5));
     }
 
     /**
