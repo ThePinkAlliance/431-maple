@@ -189,15 +189,16 @@ public class RobotContainer {
         new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
         new POVButton(controller, 90).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
 
-        new JoystickButton(controller, ButtonID.LB)
-                .onTrue(new MoveElevator(coralSubsystem, Constants.CoralSubsystemConstants.ElevatorSetpoints.kLevel4)
-                        .andThen(new MoveArm(coralSubsystem, Constants.CoralSubsystemConstants.ArmSetpoints.kLevel4))
-                        .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
-                        .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
+        // new JoystickButton(controller, ButtonID.LB)
+        //         .onTrue(new MoveElevator(coralSubsystem, Constants.CoralSubsystemConstants.ElevatorSetpoints.kLevel4)
+        //                 .andThen(new MoveArm(coralSubsystem, Constants.CoralSubsystemConstants.ArmSetpoints.kLevel4))
+        //                 .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
+        //                 .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
 
         new JoystickButton(controller, ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
         new JoystickButton(controller, ButtonID.RB).whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 5,0.5));
+        new JoystickButton(controller, ButtonID.LB).whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 0,0));
     }
 
     /**
