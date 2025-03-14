@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.algae;
 
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,57 +13,123 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SimulationRobotConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class AlgaeSubsystem extends SubsystemBase {
-    private SparkFlex intakeMotor;
-    private SparkMax pivotMotor;
+  private SparkFlex intakeMotor;
+  private SparkMax pivotMotor;
+  private SparkClosedLoopController rotationClosedLoopController;
 
-    private SparkClosedLoopController rotationClosedLoopController;
+  private SparkMaxSim armMotorSim;
+  private DCMotor armMotorModel = DCMotor.getNEO(1);
+  private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(
+      armMotorModel,
+      SimulationRobotConstants.kArmReduction,
+      SingleJointedArmSim.estimateMOI(SimulationRobotConstants.kArmLength, SimulationRobotConstants.kArmMass),
+      SimulationRobotConstants.kArmLength,
+      SimulationRobotConstants.kMinAngleRads,
+      SimulationRobotConstants.kMaxAngleRads,
+      true,
+      SimulationRobotConstants.kMinAngleRads,
+      0.0,
+      0.0);
 
-    /** Creates a new AlgaeSubsystem. */
-    public AlgaeSubsystem() {
-        this.intakeMotor = new SparkFlex(Constants.AlgaeSubsystemConstants.kIntakeMotorCanId, MotorType.kBrushless);
-        this.pivotMotor = new SparkMax(Constants.AlgaeSubsystemConstants.kPivotMotorCanId, MotorType.kBrushless);
+  // Mechanism2d setup for subsystem
+  private final Mechanism2d m_mech2d = new Mechanism2d(50, 50);
+  private final MechanismRoot2d m_mech2dRoot = m_mech2d.getRoot("ElevatorArm Root", 25, 0);
+  private final MechanismLigament2d m_elevatorMech2d = m_mech2dRoot.append(new MechanismLigament2d(
+      "Elevator",
+      SimulationRobotConstants.kMinElevatorHeightMeters * SimulationRobotConstants.kPixelsPerMeter,
+      90));
+  private final MechanismLigament2d m_armMech2d = m_elevatorMech2d.append(new MechanismLigament2d(
+      "Arm",
+      SimulationRobotConstants.kArmLength * SimulationRobotConstants.kPixelsPerMeter,
+      180 - Units.radiansToDegrees(SimulationRobotConstants.kMinAngleRads) - 90));
 
-        SparkMaxConfig rotationConfig = new SparkMaxConfig();
+  /** Creates a new AlgaeSubsystem. */
+  public AlgaeSubsystem() {
+    this.intakeMotor = new SparkFlex(Constants.AlgaeSubsystemConstants.kIntakeMotorCanId, MotorType.kBrushless);
+    this.pivotMotor = new SparkMax(Constants.AlgaeSubsystemConstants.kPivotMotorCanId, MotorType.kBrushless);
+    this.armMotorSim = new SparkMaxSim(pivotMotor, armMotorModel);
 
-        rotationConfig.closedLoop.p(0.1).outputRange(-0.5, 0.5);
+    SparkMaxConfig rotationConfig = new SparkMaxConfig();
 
-        this.pivotMotor.configure(rotationConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        this.rotationClosedLoopController = pivotMotor.getClosedLoopController();
-    }
+    rotationConfig.closedLoop.p(0.1).outputRange(-0.25, 0.25);
+    rotationConfig.voltageCompensation(12);
+    rotationConfig.idleMode(IdleMode.kBrake);
 
-    public double getPosition() {
-        return this.pivotMotor.getEncoder().getPosition();
-    }
+    this.pivotMotor.configure(rotationConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    this.rotationClosedLoopController = pivotMotor.getClosedLoopController();
+  }
 
-    public void setPower(double power) {
-        intakeMotor.set(power);
-    }
+  public double getPosition() {
+    return this.pivotMotor.getEncoder().getPosition();
+  }
 
-    public Command setPowerCommand(double power) {
-        return this.run(() -> setPower(power));
-    }
+  public void setPower(double power) {
+    intakeMotor.set(power);
+  }
 
-    public void setRotation(double target) {
-        this.rotationClosedLoopController.setReference(target, ControlType.kPosition);
+  public Command setPowerCommand(double power) {
+    return this.run(() -> setPower(power));
+  }
 
-        Logger.recordOutput("Algae/Pivot Target", target);
-    }
-    public Command setRotationCommand(double rotations) {
-            return this.run(() -> setRotation(rotations));
-        
-    }
+  public void setRotation(double target) {
+    this.rotationClosedLoopController.setReference(target, ControlType.kPosition);
 
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
+    Logger.recordOutput("Algae/Pivot Target", target);
+  }
 
-        Logger.recordOutput("Algae/Pivot Position", getPosition());
-    }
+  public Command setRotationCommand(double rotations) {
+    return this.run(() -> setRotation(rotations));
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // In this method, we update our simulation of what our elevator is doing
+    // First, we set our "inputs" (voltages)
+    m_armSim.setInput(pivotMotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+
+    m_armSim.update(0.020);
+
+    // Iterate the elevator and arm SPARK simulations
+    armMotorSim.iterate(
+        Units.radiansPerSecondToRotationsPerMinute(
+            m_armSim.getVelocityRadPerSec() * SimulationRobotConstants.kAlgaeReduction),
+        RobotController.getBatteryVoltage(),
+        0.02);
+
+    Logger.recordOutput("Algae/Pivot Position", armMotorSim.getRelativeEncoderSim().getPosition());
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+
+    m_armMech2d.setAngle(
+        180
+            - ( // mirror the angles so they display in the correct direction
+            Units.radiansToDegrees(SimulationRobotConstants.kMinAngleRads)
+                + Units.rotationsToDegrees(
+                    pivotMotor.getEncoder().getPosition() / SimulationRobotConstants.kAlgaeReduction))
+            - 90 // subtract 90 degrees to account for the elevator
+    );
+
+    Logger.recordOutput("Algae/Pivot Position", getPosition());
+  }
 }
