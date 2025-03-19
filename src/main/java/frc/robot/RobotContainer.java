@@ -178,6 +178,9 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         // Default command, normal field-relative drive
+        new JoystickButton(controller, ButtonID.window_thing)
+                .onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d())));
+
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> controller.getRawAxis(1), () -> controller.getRawAxis(0), () -> controller.getRawAxis(4)));
 

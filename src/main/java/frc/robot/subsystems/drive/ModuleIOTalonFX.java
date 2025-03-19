@@ -91,7 +91,17 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         turnConfig.Feedback.FeedbackSensorSource = switch (constants.FeedbackSource) {
             case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
             case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
-            case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;};
+            case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
+            case FusedCANdiPWM1 -> FeedbackSensorSourceValue.FusedCANdiPWM1;
+            case FusedCANdiPWM2 -> FeedbackSensorSourceValue.FusedCANdiPWM2;
+            case RemoteCANdiPWM1 -> FeedbackSensorSourceValue.RemoteCANdiPWM1;
+            case RemoteCANdiPWM2 -> FeedbackSensorSourceValue.RemoteCANdiPWM2;
+            case SyncCANdiPWM1 -> FeedbackSensorSourceValue.SyncCANdiPWM1;
+            case SyncCANdiPWM2 -> FeedbackSensorSourceValue.SyncCANdiPWM2;
+
+                // Don't use this mode we don't have the proper feedback mode for PulseWidth On
+                // TalonFX S
+            case TalonFXS_PulseWidth -> FeedbackSensorSourceValue.RemoteCANdiPWM1;};
         turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
         turnConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0 / constants.SteerMotorGearRatio;
         turnConfig.MotionMagic.MotionMagicAcceleration = turnConfig.MotionMagic.MotionMagicCruiseVelocity / 0.100;
