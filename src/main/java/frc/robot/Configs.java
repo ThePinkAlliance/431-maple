@@ -80,7 +80,7 @@ public final class Configs {
                     // Set MAXMotion parameters for position control
                     .maxVelocity(2000)
                     .maxAcceleration(10000)
-                    .allowedClosedLoopError(0.15);
+                    .allowedClosedLoopError(0.25);
 
             armConfig.inverted(true);
 
@@ -110,7 +110,7 @@ public final class Configs {
                     // Set MAXMotion parameters for position control
                     .maxVelocity(4200)
                     .maxAcceleration(6000)
-                    .allowedClosedLoopError(0.5);
+                    .allowedClosedLoopError(0.15);
 
             // Configure basic settings of the intake motor
             intakeConfig.inverted(true).idleMode(IdleMode.kBrake).smartCurrentLimit(40);

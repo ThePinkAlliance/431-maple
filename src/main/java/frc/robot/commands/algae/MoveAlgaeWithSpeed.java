@@ -4,22 +4,29 @@
 
 package frc.robot.commands.algae;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.lib.ButtonID;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class MoveAlgaeWithSpeed extends SequentialCommandGroup {
-  /** Creates a new MoveAlgaeWithSpeed. */
-  public MoveAlgaeWithSpeed(AlgaeSubsystem algaeSubsystem, double TargetRotations, double desiredSpeed) {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands(algaeSubsystem.setRotationCommand(TargetRotations), algaeSubsystem.setPowerCommand(desiredSpeed));
-    handleInterrupt(() -> {
-      algaeSubsystem.setPower(0);
-    });
-  }
+    AlgaeSubsystem algaeSubsystem;
+
+    /** Creates a new MoveAlgaeWithSpeed. */
+    public MoveAlgaeWithSpeed(AlgaeSubsystem algaeSubsystem, double TargetRotations, double desiredSpeed) {
+        // Add your commands in the addCommands() call, e.g.
+        // addCommands(new FooCommand(), new BarCommand());
+
+        this.algaeSubsystem = algaeSubsystem;
+
+        addCommands(algaeSubsystem.setRotationCommand(TargetRotations), algaeSubsystem.setPowerCommand(desiredSpeed));
+    }
+
+    public Command withInterupt() {
+        return this.handleInterrupt(() -> {
+            algaeSubsystem.setPower(0);
+        });
+    }
 }

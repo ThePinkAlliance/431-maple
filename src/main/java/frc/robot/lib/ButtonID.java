@@ -14,6 +14,6 @@ public class ButtonID {
     public static final int RB = 6;
     public static final int window_thing = 7;
     public static final int three_lines = 8;
-    public static final int LS = 9;
-    public static final int RS = 10;
+    public static final int LS = 2;
+    public static final int RS = 3;
 }

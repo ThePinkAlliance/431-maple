@@ -30,12 +30,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.algae.MoveAlgaeWithSpeed;
 import frc.robot.commands.algae.RemoveAlgae;
-import frc.robot.commands.arm.MoveArm;
-import frc.robot.commands.elevator.MoveElevator;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.ButtonID;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
@@ -58,7 +57,7 @@ public class RobotContainer {
     private final Drive drive;
     private final Vision vision;
     private final CoralSubsystem coralSubsystem;
-     private final AlgaeSubsystem algaeSubsystem;
+    private final AlgaeSubsystem algaeSubsystem;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -73,7 +72,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         coralSubsystem = new CoralSubsystem();
-         algaeSubsystem = new AlgaeSubsystem();
+        algaeSubsystem = new AlgaeSubsystem();
 
         // Registers all the commands that pathplanner will use before autos.
         registerNamedCommands();
@@ -90,8 +89,8 @@ public class RobotContainer {
                         (pose) -> {});
                 this.vision = new Vision(
                         drive,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                        new VisionIOPhotonVision(VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                        new VisionIOPhotonVision(VisionConstants.camera1Name, VisionConstants.robotToCamera1));
 
                 break;
             case SIM:
@@ -115,9 +114,7 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                camera2Name, robotToCamera2, driveSimulation::getSimulatedDriveTrainPose));
+                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
                 break;
 
@@ -184,21 +181,40 @@ public class RobotContainer {
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> controller.getRawAxis(1), () -> controller.getRawAxis(0), () -> controller.getRawAxis(4)));
 
-        new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
-        new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
-        new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
-        new POVButton(controller, 90).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
+        new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
+        new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+
+        new Trigger(() -> controller.getRawAxis(ButtonID.LS) >= 0.05)
+                .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
+
+        new Trigger(() -> controller.getRawAxis(ButtonID.RS) >= 0.05)
+                .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
 
         // new JoystickButton(controller, ButtonID.LB)
-        //         .onTrue(new MoveElevator(coralSubsystem, Constants.CoralSubsystemConstants.ElevatorSetpoints.kLevel4)
-        //                 .andThen(new MoveArm(coralSubsystem, Constants.CoralSubsystemConstants.ArmSetpoints.kLevel4))
-        //                 .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
-        //                 .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
+        // .onTrue(new MoveElevator(coralSubsystem,
+        // Constants.CoralSubsystemConstants.ElevatorSetpoints.kLevel4)
+        // .andThen(new MoveArm(coralSubsystem,
+        // Constants.CoralSubsystemConstants.ArmSetpoints.kLevel4))
+        // .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
+        // .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
 
         new JoystickButton(controller, ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
         new JoystickButton(controller, ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
-        new JoystickButton(controller, ButtonID.RB).whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 5,0.5));
-        new JoystickButton(controller, ButtonID.LB).whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 0,0));
+        new JoystickButton(controller, ButtonID.Y).whileTrue(coralSubsystem.reverseIntakeCommand(-0.25));
+        new JoystickButton(controller, ButtonID.RB)
+                .whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 5, 0.5))
+                .onFalse(algaeSubsystem
+                        .setRotationCommand(0)
+                        .withTimeout(0.5)
+                        .andThen(algaeSubsystem.setPowerCommand(0)));
+
+        new JoystickButton(controller, ButtonID.LB)
+                .whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 0, -0.5))
+                .onFalse(algaeSubsystem
+                        .setRotationCommand(0)
+                        .withTimeout(0.5)
+                        .andThen(algaeSubsystem.setPowerCommand(0)));
     }
 
     /**
