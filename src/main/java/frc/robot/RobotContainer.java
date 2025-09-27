@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.Ghost;
 import frc.robot.commands.algae.MoveAlgaeWithSpeed;
 import frc.robot.commands.algae.RemoveAlgae;
 import frc.robot.generated.TunerConstants;
@@ -226,7 +227,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return new Ghost(drive, vision);
     }
 
     public void resetSimulationField() {
