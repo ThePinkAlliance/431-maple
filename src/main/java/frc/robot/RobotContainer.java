@@ -17,7 +17,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -29,18 +28,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.Ghost;
 import frc.robot.commands.algae.MoveAlgaeWithSpeed;
-import frc.robot.commands.algae.RemoveAlgae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.lib.ButtonID;
 import frc.robot.subsystems.algae.AlgaeSubsystem;
-import frc.robot.subsystems.coral.CoralSubsystem;
-import frc.robot.subsystems.coral.CoralSubsystem.Setpoint;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import org.ironmaple.simulation.SimulatedArena;
@@ -56,8 +49,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final Vision vision;
-    private final CoralSubsystem coralSubsystem;
+    // private final Vision vision;
+    // private final CoralSubsystem coralSubsystem;
     private final AlgaeSubsystem algaeSubsystem;
 
     private SwerveDriveSimulation driveSimulation = null;
@@ -72,7 +65,7 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        coralSubsystem = new CoralSubsystem();
+        // coralSubsystem = new CoralSubsystem();
         algaeSubsystem = new AlgaeSubsystem();
 
         // Registers all the commands that pathplanner will use before autos.
@@ -88,10 +81,12 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                         new ModuleIOTalonFXReal(TunerConstants.BackRight),
                         (pose) -> {});
-                this.vision = new Vision(
-                        drive,
-                        new VisionIOPhotonVision(VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                        new VisionIOPhotonVision(VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                // this.vision = new Vision(
+                // drive,
+                // new VisionIOPhotonVision(VisionConstants.camera0Name,
+                // VisionConstants.robotToCamera0),
+                // new VisionIOPhotonVision(VisionConstants.camera1Name,
+                // VisionConstants.robotToCamera1));
 
                 break;
             case SIM:
@@ -110,12 +105,12 @@ public class RobotContainer {
                         new ModuleIOTalonFXSim(
                                 TunerConstants.BackRight, driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
-                vision = new Vision(
-                        drive,
-                        new VisionIOPhotonVisionSim(
-                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                // vision = new Vision(
+                // drive,
+                // new VisionIOPhotonVisionSim(
+                // camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                // new VisionIOPhotonVisionSim(
+                // camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
                 break;
 
@@ -128,7 +123,6 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         (pose) -> {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
                 break;
         }
@@ -155,21 +149,28 @@ public class RobotContainer {
     }
 
     public void registerNamedCommands() {
-        NamedCommands.registerCommand("level_3", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
-        NamedCommands.registerCommand("prep_level_3", coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        // NamedCommands.registerCommand("level_3",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        // NamedCommands.registerCommand("prep_level_3",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
 
-        NamedCommands.registerCommand("level_2", coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
-        NamedCommands.registerCommand("prep_level_2", coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        // NamedCommands.registerCommand("level_2",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        // NamedCommands.registerCommand("prep_level_2",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
 
-        NamedCommands.registerCommand("level_1", coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
-        NamedCommands.registerCommand("prep_level_1", coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        // NamedCommands.registerCommand("level_1",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        // NamedCommands.registerCommand("prep_level_1",
+        // coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
 
-        NamedCommands.registerCommand("stow", coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
-        NamedCommands.registerCommand(
-                "deposit", coralSubsystem.reverseIntakeCommand().withTimeout(0.5));
+        // NamedCommands.registerCommand("stow",
+        // coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
+        // NamedCommands.registerCommand(
+        // "deposit", coralSubsystem.reverseIntakeCommand().withTimeout(0.5));
 
-        NamedCommands.registerCommand("feed_coral", Commands.none());
-        NamedCommands.registerCommand("free_algae", new RemoveAlgae(coralSubsystem));
+        // NamedCommands.registerCommand("feed_coral", Commands.none());
+        // NamedCommands.registerCommand("free_algae", new RemoveAlgae(coralSubsystem));
     }
 
     /**
@@ -185,15 +186,18 @@ public class RobotContainer {
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> controller.getRawAxis(1), () -> controller.getRawAxis(0), () -> controller.getRawAxis(4)));
 
-        new POVButton(controller, 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
-        new POVButton(controller, 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
-        new POVButton(controller, 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
+        // new POVButton(controller,
+        // 0).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel4));
+        // new POVButton(controller,
+        // 270).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel3));
+        // new POVButton(controller,
+        // 180).onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel2));
 
-        new Trigger(() -> controller.getRawAxis(ButtonID.LS) >= 0.05)
-                .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
+        // new Trigger(() -> controller.getRawAxis(ButtonID.LS) >= 0.05)
+        // .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kFeederStation));
 
-        new Trigger(() -> controller.getRawAxis(ButtonID.RS) >= 0.05)
-                .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+        // new Trigger(() -> controller.getRawAxis(ButtonID.RS) >= 0.05)
+        // .onTrue(coralSubsystem.setSetpointCommand(Setpoint.kLevel1));
 
         // new JoystickButton(controller, ButtonID.LB)
         // .onTrue(new MoveElevator(coralSubsystem,
@@ -203,9 +207,12 @@ public class RobotContainer {
         // .andThen(coralSubsystem.reverseIntakeCommand(-0.22).withTimeout(3))
         // .andThen(coralSubsystem.setSetpointCommand(Setpoint.kLevel1)));
 
-        new JoystickButton(controller, ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
-        new JoystickButton(controller, ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
-        new JoystickButton(controller, ButtonID.Y).whileTrue(coralSubsystem.reverseIntakeCommand(-0.25));
+        // new JoystickButton(controller,
+        // ButtonID.A).whileTrue(coralSubsystem.runIntakeCommand());
+        // new JoystickButton(controller,
+        // ButtonID.B).whileTrue(coralSubsystem.reverseIntakeCommand());
+        // new JoystickButton(controller,
+        // ButtonID.Y).whileTrue(coralSubsystem.reverseIntakeCommand(-0.25));
         new JoystickButton(controller, ButtonID.RB)
                 .whileTrue(new MoveAlgaeWithSpeed(algaeSubsystem, 5, 0.5))
                 .onFalse(algaeSubsystem
@@ -227,7 +234,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return new Ghost(drive, vision);
+        // return new Ghost(drive, vision);
+        return Commands.none();
     }
 
     public void resetSimulationField() {
